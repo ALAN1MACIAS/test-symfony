@@ -4,12 +4,18 @@ namespace App\Controller;
 
 use App\Entity\Book;
 use App\Repository\BookRepository;
+use App\Command\UpdateStockCommand;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\BufferedOutput;
+
 
 class LibraryController extends AbstractController
 {
@@ -74,6 +80,22 @@ class LibraryController extends AbstractController
         ]
       ]
     ]);
+    return $response;
+  }
+
+  /**
+   * @Route("/csv", name="csv")
+   */
+  public function csv(UpdateStockCommand $updateStockCommand){
+    
+    $command = $updateStockCommand;
+    $file = "ventas";
+    $rows = $command->getCsvRowsAsArray($file);
+    $response = new JsonResponse();
+    $response->setData([
+      'data' => $rows
+    ]);
+
     return $response;
   }
 }
